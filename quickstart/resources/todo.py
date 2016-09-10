@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
+from flask import request
+from flask_restful import HTTPException
 from flask_restful_swagger_2 import Resource, swagger
 
+from quickstart.docs.todo import DOCS
 from quickstart.schemas.error import ErrorSchema
 from quickstart.schemas.todo import TodoSchema
 
-todo_list = []
+TODO_LIST = [TodoSchema(id=1, description='Work work work')]
+
+
+class TodoNotFoundException(HTTPException):
+    pass
+
 
 class TodoResource(Resource):
     @swagger.doc({
@@ -33,20 +41,9 @@ class TodoResource(Resource):
             }
         }
     })
-    def get(self, _parser):
-        """
-        Returns all users.
-        :param _parser: Query parameter parser
-        """
-        # swagger.doc decorator returns a query parameter parser in the special
-        # '_parser' function argument if it is present
-        args = _parser.parse_args()
+    def get(self):
+        return map(lambda todo: TodoSchema(**todo), TODO_LIST), 200
 
-        users = ([u for u in known_users if u['name'] == args['name']]
-                 if 'name' in args else known_users)
-
-        # Return data through schema model
-        return map(lambda user: UserModel(**user), users), 200
     @swagger.doc({
         'tags': ['todo'],
         'description': 'Adds a todo',
@@ -56,7 +53,7 @@ class TodoResource(Resource):
                 'description': 'Request body',
                 'in': 'body',
                 'schema': TodoSchema,
-                'required': True,
+                'required': True
             }
         ],
         'responses': {
@@ -78,19 +75,15 @@ class TodoResource(Resource):
         }
     })
     def post(self):
-        """
-        Adds a todo item.
-        """
-        # Validate request body with schema model
         try:
             data = TodoSchema(**request.get_json())
-
         except ValueError as e:
             return ErrorSchema(**{'message': e.args[0]}), 400
 
-        data['id'] = len(todo_list) + 1
-        todo_list.append(data)
-        return data, 201, {'Location': request.path + '/' + str(data['id'])}
+        data['id'] = len(TODO_LIST) + 1
+        TODO_LIST.append(data)
+        return data, 201
+
 
 class TodoDetailResource(Resource):
     @swagger.doc({
@@ -116,16 +109,9 @@ class TodoDetailResource(Resource):
                 }
             }
         }
-     })
+    })
     def get(self, todo_id):
-        """
-        Returns a specific todo item.
-        :param todo_id: The todo item identifier.
-        """
-        todo = next((t for t in todo_list if t['id'] == todo_id), None)
-
-        if todo is None:
-            return ErrorSchema(**{'message': "Todo id {} not found".format(todo_id)}), 404
-
-        # Return data through schema model
+        todo = next((t for t in TODO_LIST if t['id'] == todo_id), None)
+        if not todo:
+            raise TodoNotFoundException
         return TodoSchema(**todo), 200

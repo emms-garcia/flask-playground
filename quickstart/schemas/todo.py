@@ -12,4 +12,4 @@ class TodoSchema(Schema):
             'type': 'string'
         },
     }
-    required = ['id', 'description']
+    required = ['description']
