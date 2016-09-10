@@ -1,18 +1,12 @@
+# -*- coding: utf-8 -*-
 import os
-
-DATABASE = 'DATABASE'
-PASSWORD = 'PASSWORD'
-SECRET_KEY = 'SECRET_KEY'
-USERNAME = 'USERNAME'
 
 CONFIG = {
     'DEVELOPMENT': {
-        DATABASE: 'quickstart.db',
-        PASSWORD: 'default'
-        SECRET_KEY: 'WOWSOKEYMUCHSECRETWOW',
-        USERNAME: 'admin',
+      'DEBUG': True,
+      # Nothing here yet.
     },
     'PRODUCTION': {
-        # Nothing here yet.
+      # Nothing here yet.
     }
 }
