@@ -1,0 +1,20 @@
+version: '2'
+services:
+  web:
+    build: .
+    command: flask run --host 0.0.0.0
+    container_name: web
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgres://postgres:@db:5432/postgres
+      - SECRET_KEY=super-secret
+      - FLASK_APP=playground.app
+      - FLASK_DEBUG=1
+    ports:
+      - "5000:5000"
+    restart: always
+    volumes:
+      - ./:/code
+
+  db:
+    container_name: db
+    image: postgres:latest
