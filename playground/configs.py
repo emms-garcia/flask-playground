@@ -4,21 +4,20 @@ import datetime
 
 class BaseConfig(object):
     DEBUG = False
-    JWT_EXPIRATION_DELTA = datetime.timedelta(days=365)
-    SECRET_KEY = os.environ['SECRET_KEY']
-    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
+    SECRET_KEY = 'super-secret'
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres:@db:5432/postgres'
 
 
 class ProductionConfig(BaseConfig):
-    pass
+    JWT_EXPIRATION_DELTA = datetime.timedelta(days=365)
 
 
-Config = dict(
+CONFIG = dict(
     DEVELOPMENT=DevelopmentConfig,
     PRODUCTION=ProductionConfig,
 ).get(os.environ.get('ENVIRONMENT'), DevelopmentConfig)
